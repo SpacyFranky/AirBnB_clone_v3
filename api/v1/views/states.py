@@ -17,61 +17,55 @@ def show_all():
     return jsonify(d)
 
 
-@app_views.route('/states/<state_id>', methods=['GET'],strict_slashes=False)
+@app_views.route('/states/<state_id>', methods=['GET'])
 def show_by_id(state_id):
     """Retrieves a State object by id"""
-    try:
-        state = storage.get("State", state_id)
-        j_state = state.to_dict()
-        return jsonify(j_state)
-    except Exception:
-        abort(404)
+    states = storage.all(State)
+    for v in states.values():
+        if v.id == state_id:
+            return jsonify(v.to_dict())
+    abort(404)
 
 
-@app_views.route('/states/<state_id>', methods=['DELETE'], strict_slashes=False)
+@app_views.route('/states/<state_id>', methods=['DELETE'])
 def delete_by_id(state_id):
     """Deletes a State object"""
     states = storage.all(State)
-    try:
-        state = storage.get("State", state_id)
-        storage.delete(state)
-        return jsonify({}), 200
-    except Exception:
-        abort(404)
+    for k, v in states.items():
+        if v.id == state_id:
+            storage.delete(v)
+            storage.save()
+            d = {}
+            return jsonify(d)
+    abort(404)
 
 
-@app_views.route('/states/', methods=['POST'], strict_slashes=False)
+@app_views.route('/states/', methods=['POST'])
 def create():
     """Creates a State"""
-    if not request.json:
-        abort(400)
-        return jsonify({"error": "Not a JSON"})
-    else:
-        state_dict = request.get_json()
-        if "name" in state_dict:
-            state_name = state_dict["name"]
-            state = State(name=state_name)
-            for k, v in state_dict.items():
-                setattr(state, k, v)
-            state.save()
-        else:
-            abort(400)
-            return jsonify({"error": "Missing name"})
-        return jsonify(state.to_dict()), 201
+    if not request.is_json:
+        raise InvalidUsage('Not a JSON', status_code=400)
+    d = request.get_json()
+    if 'name' not in d.keys():
+        raise InvalidUsage('Missing name', status_code=400)
+    n = State(name=d['name'])
+    storage.new(n)
+    storage.save()
+    return jsonify(n.to_dict()), 201
 
 
-@app_views.route('/states/<state_id>', methods=['PUT'], strict_slashes=False)
+@app_views.route('/states/<state_id>', methods=['PUT'])
 def update(state_id):
     """Updates a State object"""
-    state = storage.get("State", state_id)
-    if not state:
-        abort(404)
-    if not request.json:
-        abort(400)
-        return jsonify({"error": "Not a JSON"})
-    req = request.get_json()
-    for k, v in req.items():
-        if k != "id" and k != "created_at" and k != "updated_at":
-            setattr(state, k, v)
-    state.save()
-    return jsonify(state.to_dict()), 200
+    if not request.is_json:
+        raise InvalidUsage('Not a JSON', status_code=400)
+    states = storage.all(State)
+    for v in states.values():
+        if v.id == state_id:
+            d = request.get_json()
+            for key, value in d.items():
+                if key not in ('created_at', 'updated_at', 'id'):
+                    setattr(v, key, value)
+            storage.save()
+            return jsonify(v.to_dict())
+    abort(404)
