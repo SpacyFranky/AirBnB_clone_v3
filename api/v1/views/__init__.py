@@ -1,8 +1,9 @@
 #!/usr/bin/python3
-"""Status of API"""
+"""Creating blueprint"""
+
 from flask import Blueprint
 
-app_views = Blueprint(url_prefix='/api/v1', name='views_blueprint',
-                      import_name=__name__)
+app_views = Blueprint('app_views', __name__, url_prefix="/api/v1")
 
 from api.v1.views.index import *
+from api.v1.views.states import *
