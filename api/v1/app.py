@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """Status of API"""
+import os
 from flask import Flask
 from flask import jsonify
 from models import storage
@@ -21,4 +22,5 @@ def teardown(a):
     storage.close()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, threaded=True)
+    app.run(host=os.getenv('HBNB_API_HOST'), port=os.getenv('HBNB_API_PORT'),
+            threaded=True)
