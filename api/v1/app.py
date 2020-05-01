@@ -10,9 +10,11 @@ app = Flask(__name__)
 app.register_blueprint(app_views)
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 
+
 @app.errorhandler(404)
 def invalid_route(a):
     return jsonify({'error': 'Not found'})
+
 
 @app.teardown_appcontext
 def teardown(a):
