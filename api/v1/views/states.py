@@ -6,7 +6,7 @@ from models.base_model import BaseModel
 from models.state import State
 from models import storage
 
-@app_views.route('/states', strict_slashes=False, methods=['GET'])
+@app_views.route('/states', methods=['GET'])
 def show_all():
     """Retrieves the list of all State objects"""
     states = storage.all(State)
@@ -16,7 +16,7 @@ def show_all():
     return jsonify(d)
 
 
-@app_views.route('/states/<state_id>', strict_slashes=False, methods=['GET'])
+@app_views.route('/states/<state_id>', methods=['GET'])
 def show_by_id(state_id):
     """Retrieves a State object by id"""
     states = storage.all(State)
@@ -26,7 +26,7 @@ def show_by_id(state_id):
     abort(404)
 
 
-@app_views.route('/states/<state_id>', strict_slashes=False, methods=['DELETE'])
+@app_views.route('/states/<state_id>', methods=['DELETE'])
 def delete_by_id(state_id):
     """Deletes a State object"""
     states = storage.all(State)
@@ -39,12 +39,12 @@ def delete_by_id(state_id):
     abort(404)
 
 
-@app_views.route('/states', strict_slashes=False, methods=['POST'])
+@app_views.route('/states', methods=['POST'])
 def create():
     """Creates a State"""
     if not request.is_json:
         abort(400, 'Not a JSON')
-    d = request.get_json(silent=True)
+    d = request.get_json()
     if 'name' not in d.keys():
         abort(400, 'Missing name')
     n = State(**d)
@@ -52,11 +52,11 @@ def create():
     return jsonify(n.to_dict()), 201
 
 
-@app_views.route('/states/<state_id>', strict_slashes=False, methods=['PUT'])
+@app_views.route('/states/<state_id>', methods=['PUT'])
 def update(state_id):
     """Updates a State object"""
     if not request.is_json:
-        raise InvalidUsage('Not a JSON', status_code=400)
+        abort(400, 'Not a JSON')
     states = storage.all(State)
     for v in states.values():
         if v.id == state_id:
