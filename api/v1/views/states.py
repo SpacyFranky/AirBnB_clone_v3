@@ -44,7 +44,7 @@ def create():
     """Creates a State"""
     if not request.is_json:
         raise InvalidUsage('Not a JSON', status_code=400)
-    d = request.get_json()
+    d = request.get_json(silent=True)
     if 'name' not in d.keys():
         raise InvalidUsage('Missing name', status_code=400)
     n = State(name=d['name'])
