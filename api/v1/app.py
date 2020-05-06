@@ -14,11 +14,13 @@ app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 
 @app.errorhandler(404)
 def invalid_route(a):
-    return jsonify({'error': 'Not found'})
+    """returns a JSON-formatted 404 status code response"""
+    return jsonify({'error': 'Not found'}), 404
 
 
 @app.teardown_appcontext
 def teardown(a):
+    """calls storage close function"""
     storage.close()
 
 if __name__ == '__main__':
