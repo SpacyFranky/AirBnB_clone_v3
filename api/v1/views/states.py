@@ -6,8 +6,7 @@ from models.base_model import BaseModel
 from models.state import State
 from models import storage
 
-
-@app_views.route('/states/', methods=['GET'])
+@app_views.route('/states', strict_slashes=False, methods=['GET'])
 def show_all():
     """Retrieves the list of all State objects"""
     states = storage.all(State)
@@ -17,7 +16,7 @@ def show_all():
     return jsonify(d)
 
 
-@app_views.route('/states/<state_id>', methods=['GET'])
+@app_views.route('/states/<state_id>', strict_slashes=False, methods=['GET'])
 def show_by_id(state_id):
     """Retrieves a State object by id"""
     states = storage.all(State)
@@ -27,7 +26,7 @@ def show_by_id(state_id):
     abort(404)
 
 
-@app_views.route('/states/<state_id>', methods=['DELETE'])
+@app_views.route('/states/<state_id>', strict_slashes=False, methods=['DELETE'])
 def delete_by_id(state_id):
     """Deletes a State object"""
     states = storage.all(State)
@@ -36,11 +35,11 @@ def delete_by_id(state_id):
             storage.delete(v)
             storage.save()
             d = {}
-            return jsonify(d)
+            return jsonify(d), 200
     abort(404)
 
 
-@app_views.route('/states/', methods=['POST'])
+@app_views.route('/states', strict_slashes=False, methods=['POST'])
 def create():
     """Creates a State"""
     if not request.is_json:
@@ -54,7 +53,7 @@ def create():
     return jsonify(n.to_dict()), 201
 
 
-@app_views.route('/states/<state_id>', methods=['PUT'])
+@app_views.route('/states/<state_id>', strict_slashes=False, methods=['PUT'])
 def update(state_id):
     """Updates a State object"""
     if not request.is_json:
@@ -67,5 +66,5 @@ def update(state_id):
                 if key not in ('created_at', 'updated_at', 'id'):
                     setattr(v, key, value)
             storage.save()
-            return jsonify(v.to_dict())
+            return jsonify(v.to_dict()), 200
     abort(404)
