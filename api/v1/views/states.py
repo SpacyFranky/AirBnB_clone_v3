@@ -43,10 +43,10 @@ def delete_by_id(state_id):
 def create():
     """Creates a State"""
     if not request.is_json:
-        raise InvalidUsage('Not a JSON', status_code=400)
+        abort(400, 'Not a JSON')
     d = request.get_json(silent=True)
     if 'name' not in d.keys():
-        raise InvalidUsage('Missing name', status_code=400)
+        abort(400, 'Missing name')
     n = State(**d)
     storage.save()
     return jsonify(n.to_dict()), 201
