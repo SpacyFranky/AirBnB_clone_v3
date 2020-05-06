@@ -48,7 +48,6 @@ def create():
     if 'name' not in d.keys():
         raise InvalidUsage('Missing name', status_code=400)
     n = State(**d)
-    storage.new(n)
     storage.save()
     return jsonify(n.to_dict()), 201
 
